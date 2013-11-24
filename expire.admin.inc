@@ -10,8 +10,6 @@
  */
 function expire_admin_settings_form() {
 
-  drupal_set_title(t('Cache Expiration'));
-
   $form['tabs'] = array(
     '#type' => 'vertical_tabs',
   );
