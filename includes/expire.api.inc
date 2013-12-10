@@ -33,7 +33,7 @@ class ExpireAPI {
       $absolute_urls = $urls;
     }
     else {
-      list($absolute_urls, $wildcards) = self::convertToAbsoluteUrls($urls);
+      list($absolute_urls, $wildcards) = self::convertToAbsoluteUrls($urls, entity_language($object_type, $object));
     }
 
     // Write some debug information.
@@ -204,9 +204,12 @@ class ExpireAPI {
    * @param $internal_paths
    *   Array of internal paths.
    *
+   * @param $langcode
+   *   The language code that we'll use to lookup the alias.
+   *
    * @return array
    */
-  protected static function convertToAbsoluteUrls($internal_paths) {
+  protected static function convertToAbsoluteUrls($internal_paths, $langcode = NULL) {
 
     $absolute_urls = array();
     $wildcards = array();
@@ -223,8 +226,16 @@ class ExpireAPI {
       }
 
       // Collect array with information about expired URLs and its wildcards.
-      $absolute_urls[$path] = url($path, array('absolute' => TRUE));
+      // Don't convert this to an alias now since we'll do that later on.
+      $absolute_urls[$path] = url($path, array('absolute' => TRUE, 'alias' => TRUE));
       $wildcards[$path] = $wildcard;
+
+      // Get the path alias for this path, and add it to the array if one was
+      // found.
+      $alias = drupal_get_path_alias($path, $langcode);
+      if ($alias != $path) {
+        $absolute_urls[$alias] = url($alias, array('absolute' => TRUE, 'alias' => TRUE));
+      }
     }
 
     return array($absolute_urls, $wildcards);
