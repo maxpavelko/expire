@@ -228,8 +228,16 @@ function expire_execute_expiration($type, $object, $action) {
 function _expire_get_expiration_handler($type) {
   static $cache_objects;
   if (!isset($cache_objects[$type])) {
-    $class = variable_get('expire_handler_' . $type, 'Expire' . drupal_ucfirst($type));
-    $cache_objects[$type] = new $class();
+
+    // Make class names more readable.
+    $bits = explode('_', $type);
+    $class_bits = array();
+    foreach ($bits as $bit) {
+      $class_bits[] = drupal_ucfirst($bit);
+    }
+
+    $class = variable_get('expire_handler_' . $type, 'Expire' . implode('', $class_bits));
+    $cache_objects[$type] = class_exists($class) ? new $class() : FALSE;
   }
   return $cache_objects[$type];
 }
