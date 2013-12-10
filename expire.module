@@ -40,6 +40,11 @@ define('EXPIRE_VOTINGAPI_DELETE', 2);
 define('EXPIRE_FILE_UPDATE', 1);
 define('EXPIRE_FILE_DELETE', 2);
 
+// Menu link actions.
+define('EXPIRE_MENU_LINK_INSERT', 1);
+define('EXPIRE_MENU_LINK_UPDATE', 2);
+define('EXPIRE_MENU_LINK_DELETE', 3);
+
 // Debug levels.
 define('EXPIRE_DEBUG_DISABLED', 0);
 define('EXPIRE_DEBUG_WATCHDOG', 1);
@@ -203,6 +208,27 @@ function expire_file_update($file) {
  */
 function expire_file_delete($file) {
   expire_execute_expiration('file', $file, EXPIRE_FILE_DELETE);
+}
+
+/**
+ * Implements hook_menu_link_delete().
+ */
+function expire_menu_link_delete($link) {
+  expire_execute_expiration('menu_link', $link, EXPIRE_MENU_LINK_DELETE);
+}
+
+/**
+ * Implements hook_menu_link_update().
+ */
+function expire_menu_link_update($link) {
+  expire_execute_expiration('menu_link', $link, EXPIRE_MENU_LINK_UPDATE);
+}
+
+/**
+ * Implements hook_menu_link_insert().
+ */
+function expire_menu_link_insert($link) {
+  expire_execute_expiration('menu_link', $link, EXPIRE_MENU_LINK_INSERT);
 }
 
 /**

@@ -9,6 +9,7 @@ files[] = includes/expire.api.inc
 files[] = includes/expire.comment.inc
 files[] = includes/expire.domain.inc
 files[] = includes/expire.interface.inc
+files[] = includes/expire.menu_link.inc
 files[] = includes/expire.node.inc
 files[] = includes/expire.user.inc
 files[] = includes/expire.votingapi.inc

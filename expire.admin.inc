@@ -425,6 +425,51 @@ function expire_admin_settings_form() {
   }
 
 
+  // MENU LINK SETTINGS.
+  $form['tabs']['menu_links'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Menu links expiration'),
+    '#group' => 'tabs',
+    '#weight' => 1,
+  );
+
+  $form['tabs']['menu_links']['actions'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Menu link actions'),
+  );
+
+  $form['tabs']['menu_links']['actions']['expire_menu_link_actions'] = array(
+    '#type' => 'checkboxes',
+    '#description' => t('Page cache for user will be expired after selected actions.'),
+    '#options' => array(
+      EXPIRE_MENU_LINK_INSERT => t('Menu link insert'),
+      EXPIRE_MENU_LINK_UPDATE => t('Menu link update'),
+      EXPIRE_MENU_LINK_DELETE => t('Menu link delete'),
+    ),
+    '#default_value' => variable_get('expire_menu_link_actions', array()),
+  );
+
+  $form['tabs']['menu_links']['expire_menu_link_override_menus'] = array(
+    '#type' => 'fieldset',
+    '#tree' => TRUE,
+    '#title' => t('What menus should expire their page urls (and at what depth) when menu is updated?'),
+  );
+
+  $options = array();
+  for ($i = 0; $i <= MENU_MAX_DEPTH; $i++) {
+    $options[$i] = $i ? t('@depth depth', array('@depth' => $i)) : t('None');
+  }
+
+  $menu_options = array_filter(variable_get('expire_menu_link_override_menus', array()));
+  foreach (menu_get_menus() as $menu_name => $menu_label) {
+    $form['tabs']['menu_links']['expire_menu_link_override_menus'][$menu_name] = array(
+      '#type' => 'select',
+      '#options' => $options,
+      '#default_value' => !empty($menu_options[$menu_name]) ? $menu_options[$menu_name] : 0,
+      '#title' => check_plain($menu_label),
+    );
+  }
+
   // Add the token tree UI.
   if (module_exists('token')) {
 
