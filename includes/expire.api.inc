@@ -27,6 +27,11 @@ class ExpireAPI {
     // Allow other modules to modify the list prior to expiring.
     drupal_alter('expire_cache', $urls, $object_type, $object, $absolute_urls_passed);
 
+    // Nothing to expire, so exit.
+    if (empty($urls)) {
+      return;
+    }
+
     // If was passed array with absolute URLs we should not do any job here.
     if ($absolute_urls_passed) {
       $wildcards = array();

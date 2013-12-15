@@ -99,9 +99,7 @@ class ExpireComment implements ExpireInterface {
     }
 
     // Flush page cache for expired urls.
-    if (!empty($expire_urls)) {
-      ExpireAPI::executeExpiration($expire_urls, 'comment', $comment);
-    }
+    ExpireAPI::executeExpiration($expire_urls, 'comment', $comment);
 
     $cache_flushed = TRUE;
   }

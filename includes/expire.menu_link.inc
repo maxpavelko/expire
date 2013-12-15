@@ -45,9 +45,7 @@ class ExpireMenuLink implements ExpireInterface {
     }
 
     // Flush page cache for expired urls.
-    if (!empty($expire_urls)) {
-      ExpireAPI::executeExpiration(array_unique($expire_urls), 'menu_link', $menu_link);
-    }
+    ExpireAPI::executeExpiration(array_unique($expire_urls), 'menu_link', $menu_link);
   }
 
   /**

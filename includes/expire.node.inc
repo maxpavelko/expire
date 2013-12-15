@@ -80,9 +80,7 @@ class ExpireNode implements ExpireInterface {
     }
 
     // Flush page cache for expired urls.
-    if (!empty($expire_urls)) {
-      ExpireAPI::executeExpiration($expire_urls, 'node', $node);
-    }
+    ExpireAPI::executeExpiration($expire_urls, 'node', $node);
   }
 
   /**
