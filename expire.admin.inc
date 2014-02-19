@@ -55,6 +55,14 @@ function expire_admin_settings_form() {
     '#markup' => $modules ? theme('item_list', array('items' => $modules)) : t('There are no implementations.'),
   );
 
+  $form['tabs']['status']['common']['expire_include_base_url'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Include base URL in expires'),
+    '#default_value' => variable_get('expire_include_base_url', EXPIRE_INCLUDE_BASE_URL),
+    '#description' => t('Include the base URL in expire requests. Compatible with Domain Access.</br>Enabling this setting when <a href="@varnish">Varnish</a> or <a href="@acquia_purge">Acquia Purge</a> modules are used as a cache backend is not recommended.<br/>If you use internal expiration, this checkbox should be selected.',
+      array('@varnish' => 'https://drupal.org/project/varnish', '@acquia_purge' => 'https://drupal.org/project/acquia_purge')),
+  );
+
   $form['tabs']['status']['debug'] = array(
     '#type' => 'fieldset',
     '#title' => t('Debug'),

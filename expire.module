@@ -14,6 +14,13 @@ define('EXPIRE_STATUS_DISABLED', 0);
 define('EXPIRE_STATUS_ENABLED_INTERNAL', 1);
 define('EXPIRE_STATUS_ENABLED_EXTERNAL', 2);
 
+// This setting should be disabled when varnish or acquia_purge modules are
+// used as cache backends. Not until this issue is fixed in varnish module:
+// https://drupal.org/node/2017097 (OR in expire). The default is true,
+// setting it to false by default could be preferable, but could also cause
+// unnecessary confusion from old users - so it stays as true.
+define('EXPIRE_INCLUDE_BASE_URL', TRUE);
+
 // Node actions.
 define('EXPIRE_NODE_INSERT', 1);
 define('EXPIRE_NODE_UPDATE', 2);

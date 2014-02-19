@@ -32,24 +32,54 @@ class ExpireAPI {
       return;
     }
 
-    // If was passed array with absolute URLs we should not do any job here.
+    // Check if base urls should be included.
+    $include_base_url = variable_get('expire_include_base_url', EXPIRE_INCLUDE_BASE_URL);
+
+    // Absolute urls may be passed from drush command or from rules action.
     if ($absolute_urls_passed) {
-      $wildcards = array();
-      $absolute_urls = $urls;
+
+      // If was passed array with absolute URLs, we need to add to them
+      // internal path first, because some external cache tools (like Varnish)
+      // works only with internal paths.
+      $urls = self::addInternalPaths($urls);
+
+      // If base url should not be include (for example, for Varnish or Acquia Purge),
+      // then remove it from values.
+      if (!$include_base_url) {
+        $urls = drupal_map_assoc(array_keys($urls));
+      }
+
+      // We not allow using wildcards for absolute urls.
+      $wildcards = array_fill_keys(array_keys($urls), FALSE);
     }
     else {
-      list($absolute_urls, $wildcards) = self::convertToAbsoluteUrls($urls, entity_language($object_type, $object));
+
+      // Define object languge. It will be used to define path aliases.
+      $language = NULL;
+      if (!empty($object_type) && !empty($object)) {
+        $language = entity_language($object_type, $object);
+      }
+
+      // Adds paths aliases, defines wildcards, etc.
+      list($urls, $wildcards) = self::processInternalPaths($urls, $language);
+
+      // If base site url should be included, then simply add it to the internal paths.
+      if ($include_base_url) {
+        foreach ($urls as $internal_path) {
+          $urls[$internal_path] = url($internal_path, array('absolute' => TRUE, 'alias' => TRUE));
+        }
+      }
     }
 
     // Write some debug information.
-    self::debugLog($absolute_urls, $wildcards, $object_type);
+    self::debugLog($urls, $wildcards, $object_type);
 
     $status = variable_get('expire_status', EXPIRE_STATUS_DISABLED);
     if ($status == EXPIRE_STATUS_ENABLED_INTERNAL) {
-      self::executeInternalExpiration($absolute_urls, $wildcards);
+      self::executeInternalExpiration($urls, $wildcards);
     }
     elseif ($status == EXPIRE_STATUS_ENABLED_EXTERNAL) {
-      self::executeExternalExpiration($absolute_urls, $wildcards, $object_type, $object);
+      self::executeExternalExpiration($urls, $wildcards, $object_type, $object);
     }
   }
 
@@ -259,19 +289,43 @@ class ExpireAPI {
   }
 
   /**
-   * Convert internal path to absolute URLs.
+   * Add internal path as a keys to array with absolute urls.
+   *
+   * @param $absolute_urls
+   *   Array with absolute urls.
+   *
+   * @return array
+   *   Array, where key is internal path, and value - absolute url.
+   */
+  protected static function addInternalPaths($absolute_urls) {
+
+    $urls = array();
+    $base_path = url('<front>', array('absolute' => TRUE));
+    foreach ($absolute_urls as $absolute_url) {
+      if (strpos($absolute_url, $base_path) === 0) {
+        $internal_path = substr($absolute_url, strlen($base_path));
+        $urls[$internal_path] = $absolute_url;
+      }
+    }
+
+    return $urls;
+  }
+
+  /**
+   * Looks for aliases and wildcards in internal paths.
+   * If finds some - add to an array with expiration paths.
    *
    * @param $internal_paths
    *   Array of internal paths.
    *
-   * @param $langcode
-   *   The language code that we'll use to lookup the alias.
+   * @param null $langcode
+   *   Language code of object that is expiring.
    *
    * @return array
    */
-  protected static function convertToAbsoluteUrls($internal_paths, $langcode = NULL) {
+  protected static function processInternalPaths($internal_paths, $langcode = NULL) {
 
-    $absolute_urls = array();
+    $urls = array();
     $wildcards = array();
 
     foreach ($internal_paths as $path) {
@@ -286,19 +340,19 @@ class ExpireAPI {
       }
 
       // Collect array with information about expired URLs and its wildcards.
-      // Don't convert this to an alias now since we'll do that later on.
-      $absolute_urls[$path] = url($path, array('absolute' => TRUE, 'alias' => TRUE));
+      $urls[$path] = $path;
       $wildcards[$path] = $wildcard;
 
       // Get the path alias for this path, and add it to the array if one was
       // found.
       $alias = drupal_get_path_alias($path, $langcode);
       if ($alias != $path) {
-        $absolute_urls[$alias] = url($alias, array('absolute' => TRUE, 'alias' => TRUE));
+        $urls[$alias] = $alias;
+        $wildcards[$alias] = $wildcard;
       }
     }
 
-    return array($absolute_urls, $wildcards);
+    return array($urls, $wildcards);
   }
 
   /**
