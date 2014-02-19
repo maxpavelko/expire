@@ -99,27 +99,34 @@ class ExpireAPI {
   }
 
   /**
-   * Find all taxonomy terms in node fields and build urls for them.
+   * Find all taxonomy terms in the entity fields and build urls for them.
    *
-   * @param $node
-   *   Node object.
+   * @param $entity
+   *   Entity object.
+   *
+   * @param $entity_type
+   *   Type of entity.
    *
    * @return array
    *   Term urls that should be flushed.
    */
-  public static function expireNodeTermPages($node) {
+  public static function expireTermPages($entity, $entity_type) {
 
     $terms = array();
-    $field_info = field_info_fields();
-    $field_instances = field_info_instances('node', $node->type);
+    list($id, $vid, $bundle_name) = entity_extract_ids($entity_type, $entity);
+    $field_instances = field_info_instances($entity_type, $bundle_name);
 
-    foreach ($field_instances as $name => $instance) {
-      if ($field_info[$name]['type'] == 'taxonomy_term_reference') {
-        $new_terms = field_get_items('node', $node, $name);
+    foreach ($field_instances as $field_name => $field_instance) {
+
+      // Load information about field.
+      $field_info = field_info_field($field_name);
+
+      if ($field_info['type'] == 'taxonomy_term_reference') {
+        $new_terms = field_get_items($entity_type, $entity, $field_name);
         if (is_array($new_terms) && !empty($new_terms)) {
           $terms = array_merge($new_terms, $terms);
         }
-        $old_terms = isset($node->original) && !empty($node->original) ? field_get_items('node', $node->original, $name) : array();
+        $old_terms = !empty($entity->original) ? field_get_items($entity_type, $entity->original, $field_name) : array();
         if (is_array($old_terms) && !empty($old_terms)) {
           $terms = array_merge($old_terms, $terms);
         }
@@ -135,36 +142,84 @@ class ExpireAPI {
   }
 
   /**
-   * Find all node references in node fields and build urls for them.
+   * Find all entity references in fields and build urls for them.
    *
-   * @param $node
-   *   Node object.
+   * @param $entity
+   *   Entity object.
+   *
+   * @param $entity_type
+   *   Type of entity.
    *
    * @return array
-   *   Node urls that should be flushed.
+   *   Entity references' urls that should be flushed.
    */
-  public static function expireNodeReferences($node) {
+  public static function expireReferences($entity, $entity_type) {
 
-    $references = array();
-    $field_info = field_info_fields();
-    $field_instances = field_info_instances('node', $node->type);
+    $field_references = array();
 
-    foreach ($field_instances as $name => $instance) {
-      if ($field_info[$name]['type'] == 'node_reference') {
-        $new_references = field_get_items('node', $node, $name);
-        if (is_array($new_references) && !empty($new_references)) {
-          $references = array_merge($new_references, $references);
+    list($id, $vid, $bundle_name) = entity_extract_ids($entity_type, $entity);
+
+    // Get all fields from current entity type.
+    $field_instances = field_info_instances($entity_type, $bundle_name);
+
+    foreach ($field_instances as $field_name => $field_instance) {
+
+      // Load information about field.
+      $field_info = field_info_field($field_name);
+
+      if (in_array($field_info['type'], array('node_reference', 'user_reference', 'entityreference'))) {
+
+        if (in_array($field_info['type'], array('node_reference', 'user_reference'))) {
+          $field_value_key = $field_info['type'] == 'node_reference' ? 'nid' : 'uid';
+          $field_entity_type = $field_info['type'] == 'node_reference' ? 'node' : 'user';
         }
-        $old_references = isset($node->original) && !empty($node->original) ? field_get_items('node', $node->original, $name) : array();
-        if (is_array($old_references) && !empty($old_references)) {
-          $references = array_merge($old_references, $references);
+        else {
+          $field_value_key = 'target_id';
+          $field_entity_type = $field_info['settings']['target_type'];
         }
+
+        // Get new values from reference field.
+        $new_references = field_get_items($entity_type, $entity, $field_name);
+
+        // Get old values from reference field.
+        $old_references = !empty($entity->original) ? field_get_items($entity_type, $entity->original, $field_name) : array();
+
+        $references = array();
+        if (!empty($new_references) && is_array($new_references)) {
+          $references = array_merge($references, $new_references);
+        }
+        if (!empty($old_references) && is_array($old_references)) {
+          $references = array_merge($references, $old_references);
+        }
+
+        foreach ($references as $reference) {
+          $field_entity_id = isset($reference[$field_value_key]) ? $reference[$field_value_key] : FALSE;
+          $field_references[$field_entity_type . $field_entity_id] = array(
+            'entity_type' => $field_entity_type,
+            'entity_id' => $field_entity_id,
+          );
+        }
+
       }
     }
 
+    // Collect urls of referenced entities.
     $urls = array();
-    foreach ($references as $reference) {
-      $urls['reference-' . $reference['nid']] = 'node/' . $reference['nid'];
+    foreach ($field_references as $field_reference) {
+
+      // Load entity.
+      $field_entity = entity_load_single($field_reference['entity_type'], $field_reference['entity_id']);
+      if (empty($field_entity)) {
+        continue;
+      }
+
+      // Get entity uri;
+      $field_entity_uri = entity_uri($field_reference['entity_type'], $field_entity);
+      if (empty($field_entity_uri['path'])) {
+        continue;
+      }
+
+      $urls['reference-' . $field_reference['entity_type'] . '-' . $field_reference['entity_id']] = $field_entity_uri['path'];
     }
 
     return $urls;

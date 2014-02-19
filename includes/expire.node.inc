@@ -60,14 +60,14 @@ class ExpireNode implements ExpireInterface {
     // Expire taxonomy term pages.
     $expire_term_pages = variable_get('expire_node_term_pages' . $variable_suffix, EXPIRE_NODE_TERM_PAGES);
     if (module_exists('taxonomy') && $expire_term_pages) {
-      $urls = ExpireAPI::expireNodeTermPages($node);
+      $urls = ExpireAPI::expireTermPages($node, 'node');
       $expire_urls = array_merge($expire_urls, $urls);
     }
 
     // Expire node reference's pages.
     $expire_node_references = variable_get('expire_node_reference_pages' . $variable_suffix, EXPIRE_NODE_REFERENCE_PAGES);
-    if (module_exists('node_reference') && $expire_node_references) {
-      $urls = ExpireAPI::expireNodeReferences($node);
+    if ((module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) && $expire_node_references) {
+      $urls = ExpireAPI::expireReferences($node, 'node');
       $expire_urls = array_merge($expire_urls, $urls);
     }
 

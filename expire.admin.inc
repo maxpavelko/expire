@@ -79,6 +79,16 @@ function expire_admin_settings_form() {
     '#weight' => 1,
   );
 
+  $form['tabs']['node']['override'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Node settings per type'),
+  );
+
+  $form['tabs']['node']['override']['info'] = array(
+    '#type' => 'item',
+    '#markup' => t('Please note that you may override this settings for each node type on the node type configuration page.'),
+  );
+
   $form['tabs']['node']['actions'] = array(
     '#type' => 'fieldset',
     '#title' => t('Node actions'),
@@ -86,7 +96,7 @@ function expire_admin_settings_form() {
 
   $form['tabs']['node']['actions']['expire_node_actions'] = array(
     '#type' => 'checkboxes',
-    '#description' => t('Page cache for node will be expired after selected actions.'),
+    '#description' => t('Page cache for node will be flushed after selected actions.'),
     '#options' => array(
       EXPIRE_NODE_INSERT => t('Node insert'),
       EXPIRE_NODE_UPDATE => t('Node update'),
@@ -103,12 +113,14 @@ function expire_admin_settings_form() {
   $form['tabs']['node']['expire']['expire_node_front_page'] = array(
     '#type' => 'checkbox',
     '#title' => t('Front page'),
+    '#description' => t('Expire url of the site front page'),
     '#default_value' => variable_get('expire_node_front_page', EXPIRE_NODE_FRONT_PAGE),
   );
 
   $form['tabs']['node']['expire']['expire_node_node_page'] = array(
     '#type' => 'checkbox',
     '#title' => t('Node page'),
+    '#description' => t('Expire url of the expiring node.'),
     '#default_value' => variable_get('expire_node_node_page', EXPIRE_NODE_NODE_PAGE),
   );
 
@@ -116,14 +128,16 @@ function expire_admin_settings_form() {
     $form['tabs']['node']['expire']['expire_node_term_pages'] = array(
       '#type' => 'checkbox',
       '#title' => t('Node term pages'),
+      '#description' => t('Expire urls of terms that are selected in the expiring node.'),
       '#default_value' => variable_get('expire_node_term_pages', EXPIRE_NODE_TERM_PAGES),
     );
   }
 
-  if (module_exists('node_reference')) {
+  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
     $form['tabs']['node']['expire']['expire_node_reference_pages'] = array(
       '#type' => 'checkbox',
       '#title' => t('Node reference pages'),
+      '#description' => t('Expire urls of entities which are referenced from the expiring node.'),
       '#default_value' => variable_get('expire_node_reference_pages', EXPIRE_NODE_REFERENCE_PAGES),
     );
   }
@@ -131,6 +145,7 @@ function expire_admin_settings_form() {
   $form['tabs']['node']['expire']['expire_node_custom'] = array(
     '#type' => 'checkbox',
     '#title' => t('Custom pages'),
+    '#description' => t('Expire user-defined custom urls.'),
     '#default_value' => variable_get('expire_node_custom', EXPIRE_NODE_CUSTOM),
   );
 
@@ -158,6 +173,16 @@ function expire_admin_settings_form() {
       '#weight' => 2,
     );
 
+    $form['tabs']['comment']['override'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Comment settings per node type'),
+    );
+
+    $form['tabs']['comment']['override']['info'] = array(
+      '#type' => 'item',
+      '#markup' => t('Please note that you may override this settings for each node type on the node type configuration page.'),
+    );
+
     $form['tabs']['comment']['actions'] = array(
       '#type' => 'fieldset',
       '#title' => t('Comment actions'),
@@ -165,7 +190,7 @@ function expire_admin_settings_form() {
 
     $form['tabs']['comment']['actions']['expire_comment_actions'] = array(
       '#type' => 'checkboxes',
-      '#description' => t('Page cache for comment will be expired after selected actions.'),
+      '#description' => t('Page cache for comment will be flushed after selected actions.'),
       '#options' => array(
         EXPIRE_COMMENT_INSERT => t('Comment insert'),
         EXPIRE_COMMENT_UPDATE => t('Comment update'),
@@ -184,18 +209,30 @@ function expire_admin_settings_form() {
     $form['tabs']['comment']['expire']['expire_comment_front_page'] = array(
       '#type' => 'checkbox',
       '#title' => t('Front page'),
+      '#description' => t('Expire url of the site front page'),
       '#default_value' => variable_get('expire_comment_front_page', EXPIRE_COMMENT_FRONT_PAGE),
     );
 
     $form['tabs']['comment']['expire']['expire_comment_comment_page'] = array(
       '#type' => 'checkbox',
       '#title' => t('Comment page'),
+      '#description' => t('Expire url of the expiring comment.'),
       '#default_value' => variable_get('expire_comment_comment_page', EXPIRE_COMMENT_COMMENT_PAGE),
     );
+
+    if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
+      $form['tabs']['comment']['expire']['expire_comment_reference_pages'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Comment\'s reference pages'),
+        '#description' => t('Expire urls of entities which are referenced from the expiring comment.'),
+        '#default_value' => variable_get('expire_comment_reference_pages', EXPIRE_COMMENT_REFERENCE_PAGES),
+      );
+    }
 
     $form['tabs']['comment']['expire']['expire_comment_node_page'] = array(
       '#type' => 'checkbox',
       '#title' => t('Comment\'s node page'),
+      '#description' => t('Expire url of the node, to which expiring comment is related.'),
       '#default_value' => variable_get('expire_comment_node_page', EXPIRE_COMMENT_NODE_PAGE),
     );
 
@@ -203,14 +240,16 @@ function expire_admin_settings_form() {
       $form['tabs']['comment']['expire']['expire_comment_node_term_pages'] = array(
         '#type' => 'checkbox',
         '#title' => t('Comment\'s node term pages'),
+        '#description' => t('Expire urls of terms that are selected in the node, to which expiring comment is related.'),
         '#default_value' => variable_get('expire_comment_node_term_pages', EXPIRE_COMMENT_NODE_TERM_PAGES),
       );
     }
 
-    if (module_exists('node_reference')) {
+    if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
       $form['tabs']['comment']['expire']['expire_comment_node_reference_pages'] = array(
         '#type' => 'checkbox',
         '#title' => t('Comment\'s node reference pages'),
+        '#description' => t('Expire urls of entities which are referenced from node, to which expiring comment is related.'),
         '#default_value' => variable_get('expire_comment_node_reference_pages', EXPIRE_COMMENT_NODE_REFERENCE_PAGES),
       );
     }
@@ -218,6 +257,7 @@ function expire_admin_settings_form() {
     $form['tabs']['comment']['expire']['expire_comment_custom'] = array(
       '#type' => 'checkbox',
       '#title' => t('Custom pages'),
+      '#description' => t('Expire user-defined custom urls.'),
       '#default_value' => variable_get('expire_comment_custom', EXPIRE_COMMENT_CUSTOM),
     );
 
@@ -252,7 +292,7 @@ function expire_admin_settings_form() {
 
   $form['tabs']['user']['actions']['expire_user_actions'] = array(
     '#type' => 'checkboxes',
-    '#description' => t('Page cache for user will be expired after selected actions.'),
+    '#description' => t('Page cache for user will be flushed after selected actions.'),
     '#options' => array(
       EXPIRE_USER_INSERT => t('User insert'),
       EXPIRE_USER_UPDATE => t('User update'),
@@ -270,18 +310,39 @@ function expire_admin_settings_form() {
   $form['tabs']['user']['expire']['expire_user_front_page'] = array(
     '#type' => 'checkbox',
     '#title' => t('Front page'),
+    '#description' => t('Expire url of the site front page'),
     '#default_value' => variable_get('expire_user_front_page', EXPIRE_USER_FRONT_PAGE),
   );
 
   $form['tabs']['user']['expire']['expire_user_user_page'] = array(
     '#type' => 'checkbox',
     '#title' => t('User page'),
+    '#description' => t('Expire url of the expiring user profile.'),
     '#default_value' => variable_get('expire_user_user_page', EXPIRE_USER_USER_PAGE),
   );
+
+  if (module_exists('taxonomy')) {
+    $form['tabs']['user']['expire']['expire_user_term_pages'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('User term pages'),
+      '#description' => t('Expire urls of terms that are selected in the expiring user profile.'),
+      '#default_value' => variable_get('expire_user_term_pages', EXPIRE_USER_TERM_PAGES),
+    );
+  }
+
+  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
+    $form['tabs']['user']['expire']['expire_user_reference_pages'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('User reference pages'),
+      '#description' => t('Expire urls of entities which are referenced from the expiring user profile.'),
+      '#default_value' => variable_get('expire_user_reference_pages', EXPIRE_USER_REFERENCE_PAGES),
+    );
+  }
 
   $form['tabs']['user']['expire']['expire_user_custom'] = array(
     '#type' => 'checkbox',
     '#title' => t('Custom pages'),
+    '#description' => t('Expire user-defined custom urls.'),
     '#default_value' => variable_get('expire_user_custom', EXPIRE_USER_CUSTOM),
   );
 
@@ -306,7 +367,7 @@ function expire_admin_settings_form() {
       '#type' => 'fieldset',
       '#title' => t('File expiration'),
       '#group' => 'tabs',
-      '#weight' => 3,
+      '#weight' => 4,
     );
 
     $form['tabs']['file']['actions'] = array(
@@ -316,7 +377,7 @@ function expire_admin_settings_form() {
 
     $form['tabs']['file']['actions']['expire_file_actions'] = array(
       '#type' => 'checkboxes',
-      '#description' => t('Page cache for file will be expired after selected actions.'),
+      '#description' => t('Page cache for file will be flushed after selected actions.'),
       '#options' => array(
         EXPIRE_FILE_UPDATE => t('File update'),
         EXPIRE_FILE_DELETE => t('File delete'),
@@ -329,21 +390,24 @@ function expire_admin_settings_form() {
       '#title' => t('What URLs should be expired when file action is triggered?'),
     );
 
-    $form['tabs']['file']['expire']['expire_file_file'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('File url'),
-      '#default_value' => variable_get('expire_file_file', EXPIRE_FILE_FILE),
-    );
-
     $form['tabs']['file']['expire']['expire_file_front_page'] = array(
       '#type' => 'checkbox',
       '#title' => t('Front page'),
+      '#description' => t('Expire url of the site front page'),
       '#default_value' => variable_get('expire_file_front_page', EXPIRE_FILE_FRONT_PAGE),
+    );
+
+    $form['tabs']['file']['expire']['expire_file_file'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('File url'),
+      '#description' => t('Expire url of the expiring file.'),
+      '#default_value' => variable_get('expire_file_file', EXPIRE_FILE_FILE),
     );
 
     $form['tabs']['file']['expire']['expire_file_custom'] = array(
       '#type' => 'checkbox',
       '#title' => t('Custom pages'),
+      '#description' => t('Expire user-defined custom urls.'),
       '#default_value' => variable_get('expire_file_custom', EXPIRE_FILE_CUSTOM),
     );
 
@@ -369,7 +433,7 @@ function expire_admin_settings_form() {
       '#type' => 'fieldset',
       '#title' => t('Votingapi expiration'),
       '#group' => 'tabs',
-      '#weight' => 4,
+      '#weight' => 5,
     );
 
     $form['tabs']['votingapi']['actions'] = array(
@@ -379,7 +443,7 @@ function expire_admin_settings_form() {
 
     $form['tabs']['votingapi']['actions']['expire_votingapi_actions'] = array(
       '#type' => 'checkboxes',
-      '#description' => t('Page cache for votes will be expired after selected actions.'),
+      '#description' => t('Page cache for votes will be flushed after selected actions.'),
       '#options' => array(
         EXPIRE_VOTINGAPI_INSERT => t('Vote insert'),
         EXPIRE_VOTINGAPI_DELETE => t('Vote delete'),
@@ -395,19 +459,21 @@ function expire_admin_settings_form() {
     $form['tabs']['votingapi']['expire']['expire_votingapi_entity_page'] = array(
       '#type' => 'checkbox',
       '#title' => t('Voted entity page'),
+      '#description' => t('Expire url of the voted entity.'),
       '#default_value' => variable_get('expire_votingapi_entity_page', EXPIRE_VOTINGAPI_ENTITY_PAGE),
     );
 
     $form['tabs']['votingapi']['expire']['expire_votingapi_entity'] = array(
       '#type' => 'checkbox',
       '#title' => t('Voted entity'),
-      '#description' => t('Note that will be executed expiration selected for voted entity type.'),
+      '#description' => t('Execute voted entity expiration. Note that will be executed expiration with expire settings for this entity type (user, node, etc).'),
       '#default_value' => variable_get('expire_votingapi_entity', EXPIRE_VOTINGAPI_ENTITY),
     );
 
     $form['tabs']['votingapi']['expire']['expire_votingapi_custom'] = array(
       '#type' => 'checkbox',
       '#title' => t('Custom pages'),
+      '#description' => t('Expire user-defined custom urls.'),
       '#default_value' => variable_get('expire_votingapi_custom', EXPIRE_VOTINGAPI_CUSTOM),
     );
 
@@ -433,7 +499,7 @@ function expire_admin_settings_form() {
       '#type' => 'fieldset',
       '#title' => t('Menu links expiration'),
       '#group' => 'tabs',
-      '#weight' => 1,
+      '#weight' => 6,
     );
 
     $form['tabs']['menu_links']['actions'] = array(
@@ -443,7 +509,7 @@ function expire_admin_settings_form() {
 
     $form['tabs']['menu_links']['actions']['expire_menu_link_actions'] = array(
       '#type' => 'checkboxes',
-      '#description' => t('Page cache for user will be expired after selected actions.'),
+      '#description' => t('Page cache for user will be flushed after selected actions.'),
       '#options' => array(
         EXPIRE_MENU_LINK_INSERT => t('Menu link insert'),
         EXPIRE_MENU_LINK_UPDATE => t('Menu link update'),
@@ -575,7 +641,7 @@ function expire_node_settings_form(&$form) {
       variable_get('expire_node_term_pages_' . $node_type, EXPIRE_NODE_TERM_PAGES);
   }
 
-  if (module_exists('node_reference')) {
+  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
     $form['expire']['node_expires']['expire_node_reference_pages']['#default_value'] =
       variable_get('expire_node_reference_pages_' . $node_type, EXPIRE_NODE_REFERENCE_PAGES);
   }
@@ -604,7 +670,12 @@ function expire_node_settings_form(&$form) {
       variable_get('expire_comment_node_term_pages_' . $node_type, EXPIRE_COMMENT_NODE_TERM_PAGES);
   }
 
-  if (module_exists('node_reference')) {
+  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
+    $form['expire']['comment_expires']['expire_comment_reference_pages']['#default_value'] =
+      variable_get('expire_comment_reference_pages_' . $node_type, EXPIRE_COMMENT_REFERENCE_PAGES);
+  }
+
+  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
     $form['expire']['comment_expires']['expire_comment_node_reference_pages']['#default_value'] =
       variable_get('expire_comment_node_reference_pages_' . $node_type, EXPIRE_COMMENT_NODE_REFERENCE_PAGES);
   }
