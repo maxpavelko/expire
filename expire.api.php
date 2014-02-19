@@ -9,11 +9,29 @@
  * Provides possibility to flush pages for external cache storages.
  *
  * @param $urls
- *   List of absolute URLs that should be flushed.
+ *   List of internal paths and/or absolute URLs that should be flushed.
+ *
+ *   Example of array (when base url include option is enabled):
+ *   array(
+ *     'node/1' => 'http://example.com/node/1',
+ *     'news' => 'http://example.com/news',
+ *   );
+ *
+ *   Example of array (when base url include option is disabled):
+ *   array(
+ *     'node/1' => 'node/1',
+ *     'news' => 'news',
+ *   );
  *
  * @param $wildcards
- *   Array with wildcards implementations.
+ *   Array with wildcards implementations for each internal path.
  *   Indicates whether should be executed wildcard cache flush.
+ *
+ *   Example:
+ *   array(
+ *     'node/1' => FALSE,
+ *     'news' => TRUE,
+ *   );
  *
  * @param $object_type
  *  Name of object type ('node', 'comment', 'user', etc).
@@ -34,7 +52,19 @@ function hook_expire_cache($urls, $wildcards, $object_type, $object) {
  * Provides possibility to change urls before they are expired.
  *
  * @param $urls
- *   List of internal paths or absolute URLs that should be flushed.
+ *   List of internal paths and/or absolute URLs that should be flushed.
+ *
+ *   Example of array (when base url include option is enabled):
+ *   array(
+ *     'node/1' => 'http://example.com/node/1',
+ *     'news' => 'http://example.com/news',
+ *   );
+ *
+ *   Example of array (when base url include option is disabled):
+ *   array(
+ *     'node/1' => 'node/1',
+ *     'news' => 'news',
+ *   );
  *
  * @param $object_type
  *  Name of object type ('node', 'comment', 'user', etc).
@@ -42,13 +72,10 @@ function hook_expire_cache($urls, $wildcards, $object_type, $object) {
  * @param $object
  *   Object (node, comment, user, etc) for which expiration is executes.
  *
- * @param $absolute_urls_passed
- *   Indicates whether absolute URLs or internal paths were passed.
- *
  * @see expire.api.inc
  */
-function hook_expire_cache_alter($urls, $object_type, $object, $absolute_urls_passed) {
-  if ($object_type == 'node' && !$absolute_urls_passed) {
+function hook_expire_cache_alter(&$urls, $object_type, $object) {
+  if ($object_type == 'node') {
     unset($urls['node-' . $object->nid]);
     $urls['example'] = 'custom_page/' . $object->uid . '/' . $object->nid;
   }
