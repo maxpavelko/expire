@@ -150,89 +150,91 @@ function expire_admin_settings_form() {
 
 
   // COMMENT SETTINGS.
-  $form['tabs']['comment'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Comment expiration'),
-    '#group' => 'tabs',
-    '#weight' => 2,
-  );
-
-  $form['tabs']['comment']['actions'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Comment actions'),
-  );
-
-  $form['tabs']['comment']['actions']['expire_comment_actions'] = array(
-    '#type' => 'checkboxes',
-    '#description' => t('Page cache for comment will be expired after selected actions.'),
-    '#options' => array(
-      EXPIRE_COMMENT_INSERT => t('Comment insert'),
-      EXPIRE_COMMENT_UPDATE => t('Comment update'),
-      EXPIRE_COMMENT_DELETE => t('Comment delete'),
-      EXPIRE_COMMENT_PUBLISH => t('Comment publish'),
-      EXPIRE_COMMENT_UNPUBLISH => t('Comment unpublish'),
-    ),
-    '#default_value' => variable_get('expire_comment_actions', array()),
-  );
-
-  $form['tabs']['comment']['expire'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('What URLs should be expired when comment action is triggered?'),
-  );
-
-  $form['tabs']['comment']['expire']['expire_comment_front_page'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Front page'),
-    '#default_value' => variable_get('expire_comment_front_page', EXPIRE_COMMENT_FRONT_PAGE),
-  );
-
-  $form['tabs']['comment']['expire']['expire_comment_comment_page'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Comment page'),
-    '#default_value' => variable_get('expire_comment_comment_page', EXPIRE_COMMENT_COMMENT_PAGE),
-  );
-
-  $form['tabs']['comment']['expire']['expire_comment_node_page'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Comment\'s node page'),
-    '#default_value' => variable_get('expire_comment_node_page', EXPIRE_COMMENT_NODE_PAGE),
-  );
-
-  if (module_exists('taxonomy')) {
-    $form['tabs']['comment']['expire']['expire_comment_node_term_pages'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Comment\'s node term pages'),
-      '#default_value' => variable_get('expire_comment_node_term_pages', EXPIRE_COMMENT_NODE_TERM_PAGES),
+  if (module_exists('comment')) {
+    $form['tabs']['comment'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Comment expiration'),
+      '#group' => 'tabs',
+      '#weight' => 2,
     );
-  }
 
-  if (module_exists('node_reference')) {
-    $form['tabs']['comment']['expire']['expire_comment_node_reference_pages'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Comment\'s node reference pages'),
-      '#default_value' => variable_get('expire_comment_node_reference_pages', EXPIRE_COMMENT_NODE_REFERENCE_PAGES),
+    $form['tabs']['comment']['actions'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Comment actions'),
     );
-  }
 
-  $form['tabs']['comment']['expire']['expire_comment_custom'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Custom pages'),
-    '#default_value' => variable_get('expire_comment_custom', EXPIRE_COMMENT_CUSTOM),
-  );
-
-  $form['tabs']['comment']['expire']['expire_comment_custom_pages'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Enter custom URLs'),
-    '#description' => t('Enter one relative URL per line, e.g. !example1.', array('!example1' => '<strong>comment/[comment:cid]</strong>')) . '<br/>'
-      . t('If you want to match a path with any ending, add "|wildcard" to the end of the line (see !link1 for details). Example: !example1 will match !example1a, but also !example1b, !example1c, etc.', array('!link1' => l('function cache_clear_all', 'https://api.drupal.org/api/drupal/includes%21cache.inc/function/cache_clear_all/7'), '!example1' => '<strong>comment/1</strong>', '!example1a' => '<strong>comment/1</strong>', '!example1b' => '<strong>comment/12</strong>', '!example1c' => '<strong>comment/123</strong>')) . '<br/>'
-      . t('You may use tokens here.'),
-    '#states' => array(
-      'visible' => array(
-        ':input[name="expire_comment_custom"]' => array('checked' => TRUE),
+    $form['tabs']['comment']['actions']['expire_comment_actions'] = array(
+      '#type' => 'checkboxes',
+      '#description' => t('Page cache for comment will be expired after selected actions.'),
+      '#options' => array(
+        EXPIRE_COMMENT_INSERT => t('Comment insert'),
+        EXPIRE_COMMENT_UPDATE => t('Comment update'),
+        EXPIRE_COMMENT_DELETE => t('Comment delete'),
+        EXPIRE_COMMENT_PUBLISH => t('Comment publish'),
+        EXPIRE_COMMENT_UNPUBLISH => t('Comment unpublish'),
       ),
-    ),
-    '#default_value' => variable_get('expire_comment_custom_pages'),
-  );
+      '#default_value' => variable_get('expire_comment_actions', array()),
+    );
+
+    $form['tabs']['comment']['expire'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('What URLs should be expired when comment action is triggered?'),
+    );
+
+    $form['tabs']['comment']['expire']['expire_comment_front_page'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Front page'),
+      '#default_value' => variable_get('expire_comment_front_page', EXPIRE_COMMENT_FRONT_PAGE),
+    );
+
+    $form['tabs']['comment']['expire']['expire_comment_comment_page'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Comment page'),
+      '#default_value' => variable_get('expire_comment_comment_page', EXPIRE_COMMENT_COMMENT_PAGE),
+    );
+
+    $form['tabs']['comment']['expire']['expire_comment_node_page'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Comment\'s node page'),
+      '#default_value' => variable_get('expire_comment_node_page', EXPIRE_COMMENT_NODE_PAGE),
+    );
+
+    if (module_exists('taxonomy')) {
+      $form['tabs']['comment']['expire']['expire_comment_node_term_pages'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Comment\'s node term pages'),
+        '#default_value' => variable_get('expire_comment_node_term_pages', EXPIRE_COMMENT_NODE_TERM_PAGES),
+      );
+    }
+
+    if (module_exists('node_reference')) {
+      $form['tabs']['comment']['expire']['expire_comment_node_reference_pages'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Comment\'s node reference pages'),
+        '#default_value' => variable_get('expire_comment_node_reference_pages', EXPIRE_COMMENT_NODE_REFERENCE_PAGES),
+      );
+    }
+
+    $form['tabs']['comment']['expire']['expire_comment_custom'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Custom pages'),
+      '#default_value' => variable_get('expire_comment_custom', EXPIRE_COMMENT_CUSTOM),
+    );
+
+    $form['tabs']['comment']['expire']['expire_comment_custom_pages'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Enter custom URLs'),
+      '#description' => t('Enter one relative URL per line, e.g. !example1.', array('!example1' => '<strong>comment/[comment:cid]</strong>')) . '<br/>'
+        . t('If you want to match a path with any ending, add "|wildcard" to the end of the line (see !link1 for details). Example: !example1 will match !example1a, but also !example1b, !example1c, etc.', array('!link1' => l('function cache_clear_all', 'https://api.drupal.org/api/drupal/includes%21cache.inc/function/cache_clear_all/7'), '!example1' => '<strong>comment/1</strong>', '!example1a' => '<strong>comment/1</strong>', '!example1b' => '<strong>comment/12</strong>', '!example1c' => '<strong>comment/123</strong>')) . '<br/>'
+        . t('You may use tokens here.'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="expire_comment_custom"]' => array('checked' => TRUE),
+        ),
+      ),
+      '#default_value' => variable_get('expire_comment_custom_pages'),
+    );
+  }
 
 
   // USER SETTINGS.
