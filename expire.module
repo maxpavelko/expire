@@ -255,7 +255,7 @@ function expire_execute_expiration($type, $object, $action) {
  * @return mixed
  */
 function _expire_get_expiration_handler($type) {
-  static $cache_objects;
+  $cache_objects = &drupal_static('expire_cache_objects', array());
   if (!isset($cache_objects[$type])) {
 
     // Make class names more readable.
