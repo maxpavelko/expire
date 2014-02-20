@@ -24,6 +24,9 @@ class ExpireAPI {
    */
   public static function executeExpiration($urls, $object_type = '', $object = NULL, $absolute_urls_passed = FALSE) {
 
+    // Allow other modules to modify the list prior to expiring.
+    drupal_alter('expire_cache', $urls, $object_type, $object, $absolute_urls_passed);
+
     // Nothing to expire, so exit.
     if (empty($urls)) {
       return;
@@ -68,12 +71,13 @@ class ExpireAPI {
       }
     }
 
-    // Allow other modules to modify the list prior to expiring.
-    drupal_alter('expire_cache', $urls, $object_type, $object);
+    // Latest possibility to change urls that should be expired.
+    drupal_alter('expire_urls', $urls, $object_type, $object);
 
     // Write some debug information.
     self::debugLog($urls, $wildcards, $object_type);
 
+    // Execute internal or external expiration.
     $status = variable_get('expire_status', EXPIRE_STATUS_DISABLED);
     if ($status == EXPIRE_STATUS_ENABLED_INTERNAL) {
       self::executeInternalExpiration($urls, $wildcards);
