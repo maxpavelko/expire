@@ -79,7 +79,7 @@ class ExpireComment implements ExpireInterface {
     // Expire comment's node term pages.
     $expire_node_term_pages = variable_get('expire_comment_node_term_pages' . $variable_suffix, EXPIRE_COMMENT_NODE_TERM_PAGES);
     if (module_exists('taxonomy') && $expire_node_term_pages) {
-      $urls = ExpireAPI::expireNodeTermPages($node);
+      $urls = ExpireAPI::expireTermPages($node, 'node');
       $expire_urls = array_merge($expire_urls, $urls);
     }
 
