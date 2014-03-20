@@ -554,8 +554,10 @@ function expire_admin_settings_form() {
     $form['tabs']['node']['expire']['expire_node_custom_pages']['#description'] .= ' ' .
       theme('token_tree_link', array('text' => t('View available tokens.'), 'token_types' => array('node')));
 
-    $form['tabs']['comment']['expire']['expire_comment_custom_pages']['#description'] .= ' ' .
-      theme('token_tree_link', array('text' => t('View available tokens.'), 'token_types' => array('comment')));
+    if (module_exists('comment')) {
+      $form['tabs']['comment']['expire']['expire_comment_custom_pages']['#description'] .= ' ' .
+        theme('token_tree_link', array('text' => t('View available tokens.'), 'token_types' => array('comment')));
+    }
 
     $form['tabs']['user']['expire']['expire_user_custom_pages']['#description'] .= ' ' .
       theme('token_tree_link', array('text' => t('View available tokens.'), 'token_types' => array('user')));
@@ -617,22 +619,25 @@ function expire_node_settings_form(&$form) {
   $form['expire']['node_expires']['#title'] = t('What pages should be expired when node action is triggered?');
 
   // COMMENT SETTINGS.
-  $form['expire']['expire_comment_override_defaults'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Override default settings for comments to this node type'),
-    '#default_value' => variable_get('expire_comment_override_defaults_' . $node_type),
-  );
+  if (module_exists('comment')) {
 
-  $form['expire']['comment_actions'] = $settings_form['tabs']['comment']['actions'];
-  $form['expire']['comment_expires'] = $settings_form['tabs']['comment']['expire'];
+    $form['expire']['expire_comment_override_defaults'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Override default settings for comments to this node type'),
+      '#default_value' => variable_get('expire_comment_override_defaults_' . $node_type),
+    );
 
-  // Display fieldsets with settings only if they should be overriden.
-  $form['expire']['comment_actions']['#states'] = array(
-    'visible' => array(':input[name="expire_comment_override_defaults"]' => array('checked' => TRUE)),
-  );
-  $form['expire']['comment_expires']['#states'] = array(
-    'visible' => array(':input[name="expire_comment_override_defaults"]' => array('checked' => TRUE)),
-  );
+    $form['expire']['comment_actions'] = $settings_form['tabs']['comment']['actions'];
+    $form['expire']['comment_expires'] = $settings_form['tabs']['comment']['expire'];
+
+    // Display fieldsets with settings only if they should be overriden.
+    $form['expire']['comment_actions']['#states'] = array(
+      'visible' => array(':input[name="expire_comment_override_defaults"]' => array('checked' => TRUE)),
+    );
+    $form['expire']['comment_expires']['#states'] = array(
+      'visible' => array(':input[name="expire_comment_override_defaults"]' => array('checked' => TRUE)),
+    );
+  }
 
   // Set default settings for this node type.
   $form['expire']['node_actions']['expire_node_actions']['#default_value'] =
@@ -661,38 +666,41 @@ function expire_node_settings_form(&$form) {
     variable_get('expire_node_custom_pages_' . $node_type);
 
   // Set default values for comments to this node type.
-  $form['expire']['comment_actions']['expire_comment_actions']['#default_value'] =
-    variable_get('expire_comment_actions_' . $node_type, array());
+  if (module_exists('comment')) {
 
-  $form['expire']['comment_expires']['expire_comment_front_page']['#default_value'] =
-    variable_get('expire_comment_front_page_' . $node_type, EXPIRE_COMMENT_FRONT_PAGE);
+    $form['expire']['comment_actions']['expire_comment_actions']['#default_value'] =
+      variable_get('expire_comment_actions_' . $node_type, array());
 
-  $form['expire']['comment_expires']['expire_comment_comment_page']['#default_value'] =
-    variable_get('expire_comment_comment_page_' . $node_type, EXPIRE_COMMENT_COMMENT_PAGE);
+    $form['expire']['comment_expires']['expire_comment_front_page']['#default_value'] =
+      variable_get('expire_comment_front_page_' . $node_type, EXPIRE_COMMENT_FRONT_PAGE);
 
-  $form['expire']['comment_expires']['expire_comment_node_page']['#default_value'] =
-    variable_get('expire_comment_node_page_' . $node_type, EXPIRE_COMMENT_NODE_PAGE);
+    $form['expire']['comment_expires']['expire_comment_comment_page']['#default_value'] =
+      variable_get('expire_comment_comment_page_' . $node_type, EXPIRE_COMMENT_COMMENT_PAGE);
 
-  if (module_exists('taxonomy')) {
-    $form['expire']['comment_expires']['expire_comment_node_term_pages']['#default_value'] =
-      variable_get('expire_comment_node_term_pages_' . $node_type, EXPIRE_COMMENT_NODE_TERM_PAGES);
+    $form['expire']['comment_expires']['expire_comment_node_page']['#default_value'] =
+      variable_get('expire_comment_node_page_' . $node_type, EXPIRE_COMMENT_NODE_PAGE);
+
+    if (module_exists('taxonomy')) {
+      $form['expire']['comment_expires']['expire_comment_node_term_pages']['#default_value'] =
+        variable_get('expire_comment_node_term_pages_' . $node_type, EXPIRE_COMMENT_NODE_TERM_PAGES);
+    }
+
+    if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
+      $form['expire']['comment_expires']['expire_comment_reference_pages']['#default_value'] =
+        variable_get('expire_comment_reference_pages_' . $node_type, EXPIRE_COMMENT_REFERENCE_PAGES);
+    }
+
+    if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
+      $form['expire']['comment_expires']['expire_comment_node_reference_pages']['#default_value'] =
+        variable_get('expire_comment_node_reference_pages_' . $node_type, EXPIRE_COMMENT_NODE_REFERENCE_PAGES);
+    }
+
+    $form['expire']['comment_expires']['expire_comment_custom']['#default_value'] =
+      variable_get('expire_comment_custom_' . $node_type, EXPIRE_COMMENT_CUSTOM);
+
+    $form['expire']['comment_expires']['expire_comment_custom_pages']['#default_value'] =
+      variable_get('expire_comment_custom_pages_' . $node_type);
   }
-
-  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
-    $form['expire']['comment_expires']['expire_comment_reference_pages']['#default_value'] =
-      variable_get('expire_comment_reference_pages_' . $node_type, EXPIRE_COMMENT_REFERENCE_PAGES);
-  }
-
-  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
-    $form['expire']['comment_expires']['expire_comment_node_reference_pages']['#default_value'] =
-      variable_get('expire_comment_node_reference_pages_' . $node_type, EXPIRE_COMMENT_NODE_REFERENCE_PAGES);
-  }
-
-  $form['expire']['comment_expires']['expire_comment_custom']['#default_value'] =
-    variable_get('expire_comment_custom_' . $node_type, EXPIRE_COMMENT_CUSTOM);
-
-  $form['expire']['comment_expires']['expire_comment_custom_pages']['#default_value'] =
-    variable_get('expire_comment_custom_pages_' . $node_type);
 
   // Attach js.
   $form['#attached']['js'][] = drupal_get_path('module', 'expire') . '/js/expire.admin.js';
