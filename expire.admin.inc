@@ -148,6 +148,20 @@ function expire_admin_settings_form() {
       '#description' => t('Expire urls of entities which are referenced from the expiring node.'),
       '#default_value' => variable_get('expire_node_reference_pages', EXPIRE_NODE_REFERENCE_PAGES),
     );
+
+    if (module_exists('field_collection')) {
+      $form['tabs']['node']['expire']['expire_node_reference_field_collection_pages'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Traverse references attached to field collections'),
+        '#description' => t('Expire urls of entities which are referenced from field collections attached to the expiring node.'),
+        '#default_value' => variable_get('expire_node_reference_field_collection_pages', EXPIRE_NODE_REFERENCE_FC_PAGES),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="expire_node_reference_pages"]' => array('checked' => TRUE),
+          ),
+        ),
+      );
+    }
   }
 
   $form['tabs']['node']['expire']['expire_node_custom'] = array(
@@ -260,6 +274,20 @@ function expire_admin_settings_form() {
         '#description' => t('Expire urls of entities which are referenced from node, to which expiring comment is related.'),
         '#default_value' => variable_get('expire_comment_node_reference_pages', EXPIRE_COMMENT_NODE_REFERENCE_PAGES),
       );
+
+      if (module_exists('field_collection')) {
+        $form['tabs']['comment']['expire']['expire_comment_node_reference_field_collection_pages'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Traverse references attached to field collections'),
+          '#description' => t('Expire urls of entities which are referenced from field collections attached to the expiring comment\'s node.'),
+          '#default_value' => variable_get('expire_comment_node_reference_field_collection_pages', EXPIRE_COMMENT_NODE_REFERENCE_FC_PAGES),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="expire_comment_node_reference_pages"]' => array('checked' => TRUE),
+            ),
+          ),
+        );
+      }
     }
 
     $form['tabs']['comment']['expire']['expire_comment_custom'] = array(
@@ -345,6 +373,20 @@ function expire_admin_settings_form() {
       '#description' => t('Expire urls of entities which are referenced from the expiring user profile.'),
       '#default_value' => variable_get('expire_user_reference_pages', EXPIRE_USER_REFERENCE_PAGES),
     );
+
+    if (module_exists('field_collection')) {
+      $form['tabs']['user']['expire']['expire_user_reference_field_collection_pages'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Traverse references attached to field collections'),
+        '#description' => t('Expire urls of entities which are referenced from field collections attached to the expiring user.'),
+        '#default_value' => variable_get('expire_user_reference_field_collection_pages', EXPIRE_USER_REFERENCE_FC_PAGES),
+        '#states' => array(
+          'visible' => array(
+            ':input[name="expire_user_reference_pages"]' => array('checked' => TRUE),
+          ),
+        ),
+      );
+    }
   }
 
   $form['tabs']['user']['expire']['expire_user_custom'] = array(
@@ -657,6 +699,11 @@ function expire_node_settings_form(&$form) {
   if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
     $form['expire']['node_expires']['expire_node_reference_pages']['#default_value'] =
       variable_get('expire_node_reference_pages_' . $node_type, EXPIRE_NODE_REFERENCE_PAGES);
+
+    if (module_exists('field_collection')) {
+      $form['expire']['node_expires']['expire_node_reference_field_collection_pages']['#default_value'] =
+        variable_get('expire_node_reference_field_collection_pages_' . $node_type, EXPIRE_NODE_REFERENCE_FC_PAGES);
+    }
   }
 
   $form['expire']['node_expires']['expire_node_custom']['#default_value'] =
@@ -693,6 +740,11 @@ function expire_node_settings_form(&$form) {
     if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
       $form['expire']['comment_expires']['expire_comment_node_reference_pages']['#default_value'] =
         variable_get('expire_comment_node_reference_pages_' . $node_type, EXPIRE_COMMENT_NODE_REFERENCE_PAGES);
+
+      if (module_exists('field_collection')) {
+        $form['expire']['comment_expires']['expire_comment_node_reference_field_collection_pages']['#default_value'] =
+          variable_get('expire_comment_node_reference_field_collection_pages_' . $node_type, EXPIRE_COMMENT_NODE_REFERENCE_FC_PAGES);
+      }
     }
 
     $form['expire']['comment_expires']['expire_comment_custom']['#default_value'] =

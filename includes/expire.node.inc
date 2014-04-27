@@ -67,7 +67,8 @@ class ExpireNode implements ExpireInterface {
     // Expire node reference's pages.
     $expire_node_references = variable_get('expire_node_reference_pages' . $variable_suffix, EXPIRE_NODE_REFERENCE_PAGES);
     if ((module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) && $expire_node_references) {
-      $urls = ExpireAPI::expireReferences($node, 'node');
+      $traverse_field_collection = module_exists('field_collection') && variable_get('expire_node_reference_field_collection_pages' . $variable_suffix, EXPIRE_NODE_REFERENCE_FC_PAGES);
+      $urls = ExpireAPI::expireReferences($node, 'node', $traverse_field_collection);
       $expire_urls = array_merge($expire_urls, $urls);
     }
 
