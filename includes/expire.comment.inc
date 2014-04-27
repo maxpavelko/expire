@@ -61,7 +61,7 @@ class ExpireComment implements ExpireInterface {
     // Expire front page.
     $expire_front_page = variable_get('expire_comment_front_page' . $variable_suffix, EXPIRE_COMMENT_FRONT_PAGE);
     if ($expire_front_page) {
-      $expire_urls['front'] = '<front>';
+      $expire_urls = ExpireAPI::getFrontPageUrls();
     }
 
     // Expire comment page.

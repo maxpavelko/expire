@@ -315,6 +315,16 @@ class ExpireAPI {
   }
 
   /**
+   * Return urls for a front page.
+   */
+  public static function getFrontPageUrls() {
+    $urls = array();
+    $urls['front'] = '';
+    $urls['front-path'] = variable_get('site_frontpage', 'node');
+    return $urls;
+  }
+
+  /**
    * Add internal path as a keys to array with absolute urls.
    *
    * @param $absolute_urls

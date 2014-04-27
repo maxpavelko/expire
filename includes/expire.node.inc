@@ -48,7 +48,7 @@ class ExpireNode implements ExpireInterface {
     // Expire front page.
     $expire_front_page = variable_get('expire_node_front_page' . $variable_suffix, EXPIRE_NODE_FRONT_PAGE);
     if ($expire_front_page) {
-      $expire_urls['front'] = '<front>';
+      $expire_urls = ExpireAPI::getFrontPageUrls();
     }
 
     // Expire node page.
