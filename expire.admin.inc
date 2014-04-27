@@ -36,9 +36,9 @@ function expire_admin_settings_form() {
       EXPIRE_STATUS_ENABLED_EXTERNAL => t('External expiration'),
     ),
     '#description' => theme('item_list', array('items' => array(
-      t('Disabled: Module will not take any effect.'),
-      t('Internal expiration: Module will execute cache_clear_all() for expired URLs.'),
-      t('External expiration: Module will invoke hook_expire_cache() for expired URLs.'),
+      t('Disabled: Module will not expire any data.'),
+      t('Internal expiration: Use this option when you did not install additional contribs that implement hook_expire_cache(). Module will execute cache_clear_all() for expired URLs.'),
+      t('External expiration: Use this option if you installed contrib (like Varnish, Boost, Purge, Acquia Purge) that implements this hook. Module will invoke hook_expire_cache() for expired URLs.'),
     ))),
     '#default_value' => variable_get('expire_status', EXPIRE_STATUS_DISABLED),
   );
@@ -48,11 +48,18 @@ function expire_admin_settings_form() {
     $modules[] = $module;
   }
 
+  if (empty($modules)) {
+    $help_message = t('You have no contribs that implement hook_expire_cache(). In this case you need to use Internal expiration to expire cached data.');
+  }
+  else {
+    $help_message = t('You have contribs that implement hook_expire_cache(). This means that most likely you want to use External expiration to expire cached data.');
+  }
+
   $form['tabs']['status']['common']['external_implementations'] = array(
     '#type' => 'item',
-    '#title' => t('External implementations'),
-    '#description' => t('List of modules that implements hook_expire_cache().'),
-    '#markup' => $modules ? theme('item_list', array('items' => $modules)) : t('There are no implementations.'),
+    '#title' => t('Modules that support external expiration'),
+    '#description' => '<strong>' . $help_message . '</strong>',
+    '#markup' => $modules ? theme('item_list', array('items' => $modules)) : t('There are no such modules.'),
   );
 
   $form['tabs']['status']['common']['expire_include_base_url'] = array(
