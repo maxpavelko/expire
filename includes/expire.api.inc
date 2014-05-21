@@ -57,7 +57,21 @@ class ExpireAPI {
       // Define object languge. It will be used to define path aliases.
       $language = NULL;
       if (!empty($object_type) && !empty($object)) {
-        $language = entity_language($object_type, $object);
+        if(function_exists('entity_language')){
+          $language = entity_language($object_type, $object);
+        }
+        else{
+          $info = entity_get_info($object_type);
+          if (isset($info['language callback']) && function_exists($info['language callback'])) {
+            $language = $info['language callback']($object_type, $object);
+          }
+          elseif (!empty($info['entity keys']['language']) && isset($object->{$info['entity keys']['language']})) {
+            $language = $object->{$info['entity keys']['language']};
+          }
+          else {
+            $language = NULL;
+          }
+        }
       }
 
       // Adds paths aliases, defines wildcards, etc.
