@@ -270,7 +270,7 @@ class ExpireAPI {
     foreach ($field_references as $field_reference) {
 
       // Load entity.
-      $field_entity = entity_load_single($field_reference['entity_type'], $field_reference['entity_id']);
+      $field_entity = _expire_load_single_entity($field_reference['entity_type'], $field_reference['entity_id']);
       if (empty($field_entity)) {
         continue;
       }
