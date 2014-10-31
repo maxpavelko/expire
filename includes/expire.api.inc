@@ -54,33 +54,46 @@ class ExpireAPI {
     }
     else {
 
-      // Define object languge. It will be used to define path aliases.
-      $language = NULL;
+      // Define a languge code. It will be used to define path aliases.
+      $langcode = NULL;
       if (!empty($object_type) && !empty($object)) {
         if(function_exists('entity_language')){
-          $language = entity_language($object_type, $object);
+          $langcode = entity_language($object_type, $object);
         }
         else{
           $info = entity_get_info($object_type);
           if (isset($info['language callback']) && function_exists($info['language callback'])) {
-            $language = $info['language callback']($object_type, $object);
+            $langcode = $info['language callback']($object_type, $object);
           }
           elseif (!empty($info['entity keys']['language']) && isset($object->{$info['entity keys']['language']})) {
-            $language = $object->{$info['entity keys']['language']};
+            $langcode = $object->{$info['entity keys']['language']};
           }
           else {
-            $language = NULL;
+            $langcode = NULL;
           }
         }
       }
 
+      // Get a language of current object (if exists). We need to respect cases
+      // when entities having one site language has been expired from another
+      // site locale. For this purpose we always have to pass a proper language
+      // key/object to get a correct URL of entity's language.
+      if ($langcode == LANGUAGE_NONE) {
+        $language = language_default();
+        $langcode = $language->language;
+      }
+      else {
+        $languages = language_list();
+        $language = isset($languages[$langcode]) ? $languages[$langcode] : NULL;
+      }
+
       // Adds paths aliases, defines wildcards, etc.
-      list($urls, $wildcards) = self::processInternalPaths($urls, $language);
+      list($urls, $wildcards) = self::processInternalPaths($urls, $langcode);
 
       // If base site url should be included, then simply add it to the internal paths.
       if ($include_base_url) {
         foreach ($urls as $internal_path) {
-          $urls[$internal_path] = url($internal_path, array('absolute' => TRUE, 'alias' => TRUE));
+          $urls[$internal_path] = url($internal_path, array('absolute' => TRUE, 'alias' => TRUE, 'language' => $language));
         }
       }
     }
