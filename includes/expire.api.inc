@@ -54,7 +54,7 @@ class ExpireAPI {
     }
     else {
 
-      // Define a languge code. It will be used to define path aliases.
+      // Define a language code. It will be used to define path aliases.
       $langcode = NULL;
       if (!empty($object_type) && !empty($object)) {
         if(function_exists('entity_language')){
