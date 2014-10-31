@@ -406,6 +406,12 @@ class ExpireAPI {
       $urls[$path] = $path;
       $wildcards[$path] = $wildcard;
 
+      // Don't process empty pass, because otherwise drupal will return us
+      // alias for the current page. And that is not what we actually want.
+      if ($path == NULL) {
+        continue;
+      }
+
       // Get the path alias for this path, and add it to the array if one was
       // found.
       $alias = drupal_get_path_alias($path, $langcode);
