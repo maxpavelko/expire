@@ -92,8 +92,13 @@ class ExpireAPI {
 
       // If base site url should be included, then simply add it to the internal paths.
       if ($include_base_url) {
-        foreach ($urls as $internal_path) {
-          $urls[$internal_path] = url($internal_path, array('absolute' => TRUE, 'alias' => TRUE, 'language' => $language));
+        foreach ($urls as $raw_url => $url) {
+          $urls[$raw_url] = url($url['path'], array(
+            'absolute' => TRUE,
+            'alias' => TRUE,
+            'language' => $language,
+            'query' => $url['query'],
+          ));
         }
       }
     }
@@ -408,8 +413,19 @@ class ExpireAPI {
         $path = implode('|', $path_parts);
       }
 
+      // Parse internal path.
+      $parsed_path = parse_url($path);
+      if (!empty($parsed_path['query'])) {
+        // Parse the query string into array.
+        parse_str($parsed_path['query'], $parsed_path['query']);
+      }
+
       // Collect array with information about expired URLs and its wildcards.
-      $urls[$path] = $path;
+      $urls[$path] = array(
+        'path' => $parsed_path['path'],
+        'query' => !empty($parsed_path['query']) ? $parsed_path['query'] : array(),
+      );
+
       $wildcards[$path] = $wildcard;
 
       // Don't process empty pass, because otherwise drupal will return us
