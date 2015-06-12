@@ -26,6 +26,11 @@ define('EXPIRE_NODE_INSERT', 1);
 define('EXPIRE_NODE_UPDATE', 2);
 define('EXPIRE_NODE_DELETE', 3);
 
+// Taxonomy term actions.
+define('EXPIRE_TAXONOMY_TERM_INSERT', 1);
+define('EXPIRE_TAXONOMY_TERM_UPDATE', 2);
+define('EXPIRE_TAXONOMY_TERM_DELETE', 3);
+
 // Comment actions.
 define('EXPIRE_COMMENT_INSERT'   , 1);
 define('EXPIRE_COMMENT_UPDATE'   , 2);
@@ -64,6 +69,12 @@ define('EXPIRE_NODE_TERM_PAGES'                 , FALSE);
 define('EXPIRE_NODE_REFERENCE_PAGES'            , FALSE);
 define('EXPIRE_NODE_REFERENCE_FC_PAGES'         , FALSE);
 define('EXPIRE_NODE_CUSTOM'                     , FALSE);
+define('EXPIRE_TAXONOMY_TERM_FRONT_PAGE'        , FALSE);
+define('EXPIRE_TAXONOMY_TERM_TAXONOMY_TERM_PAGE', TRUE);
+define('EXPIRE_TAXONOMY_TERM_TERM_PAGES'        , FALSE);
+define('EXPIRE_TAXONOMY_TERM_REFERENCE_PAGES'   , FALSE);
+define('EXPIRE_TAXONOMY_TERM_REFERENCE_FC_PAGES', FALSE);
+define('EXPIRE_TAXONOMY_TERM_CUSTOM'            , FALSE);
 define('EXPIRE_COMMENT_FRONT_PAGE'              , FALSE);
 define('EXPIRE_COMMENT_COMMENT_PAGE'            , TRUE);
 define('EXPIRE_COMMENT_REFERENCE_PAGES'         , FALSE);
@@ -130,6 +141,35 @@ function expire_node_update($node) {
  */
 function expire_node_delete($node) {
   expire_execute_expiration('node', $node, EXPIRE_NODE_DELETE);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function expire_form_taxonomy_form_vocabulary_alter(&$form, &$form_state) {
+  module_load_include('admin.inc', 'expire');
+  expire_taxonomy_term_settings_form($form, $form_state);
+}
+
+/**
+ * Implements hook_taxonomy_term_insert().
+ */
+function expire_taxonomy_term_insert($taxonomy_term) {
+  expire_execute_expiration('taxonomy_term', $taxonomy_term, EXPIRE_TAXONOMY_TERM_INSERT);
+}
+
+/**
+ * Implements hook_taxonomy_term_update().
+ */
+function expire_taxonomy_term_update($taxonomy_term) {
+  expire_execute_expiration('taxonomy_term', $taxonomy_term, EXPIRE_TAXONOMY_TERM_UPDATE);
+}
+
+/**
+ * Implements hook_taxonomy_term_delete().
+ */
+function expire_taxonomy_term_delete($taxonomy_term) {
+  expire_execute_expiration('taxonomy_term', $taxonomy_term, EXPIRE_TAXONOMY_TERM_DELETE);
 }
 
 /**

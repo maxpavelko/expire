@@ -11,6 +11,7 @@ files[] = includes/expire.domain.inc
 files[] = includes/expire.interface.inc
 files[] = includes/expire.menu_link.inc
 files[] = includes/expire.node.inc
+files[] = includes/expire.taxonomy_term.inc
 files[] = includes/expire.user.inc
 files[] = includes/expire.votingapi.inc
 files[] = includes/expire.file.inc

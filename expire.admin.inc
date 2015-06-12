@@ -193,13 +193,124 @@ function expire_admin_settings_form() {
   );
 
 
+  // TAXONOMY TERM SETTINGS.
+  if (module_exists('taxonomy')) {
+    $form['tabs']['taxonomy_term'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Taxonomy term expiration'),
+      '#group' => 'tabs',
+      '#weight' => 2,
+    );
+
+    $form['tabs']['taxonomy_term']['override'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Taxonomy term settings per vocabulary'),
+    );
+
+    $form['tabs']['taxonomy_term']['override']['info'] = array(
+      '#type' => 'item',
+      '#markup' => t('Please note that you may override this settings for each vocabulary on the vocabulary configuration page.'),
+    );
+
+    $form['tabs']['taxonomy_term']['actions'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Taxonomy term actions'),
+    );
+
+    $form['tabs']['taxonomy_term']['actions']['expire_taxonomy_term_actions'] = array(
+      '#type' => 'checkboxes',
+      '#description' => t('Page cache for taxonomy term will be flushed after selected actions.'),
+      '#options' => array(
+        EXPIRE_TAXONOMY_TERM_INSERT => t('Taxonomy term insert'),
+        EXPIRE_TAXONOMY_TERM_UPDATE => t('Taxonomy term update'),
+        EXPIRE_TAXONOMY_TERM_DELETE => t('Taxonomy term delete'),
+      ),
+      '#default_value' => variable_get('expire_taxonomy_term_actions', array()),
+    );
+
+    $form['tabs']['taxonomy_term']['expire'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('What URLs should be expired when taxonomy term action is triggered?'),
+    );
+
+    $form['tabs']['taxonomy_term']['expire']['expire_taxonomy_term_front_page'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Front page'),
+      '#description' => t('Expire url of the site front page'),
+      '#default_value' => variable_get('expire_taxonomy_term_front_page', EXPIRE_TAXONOMY_TERM_FRONT_PAGE),
+    );
+
+    $form['tabs']['taxonomy_term']['expire']['expire_taxonomy_term_taxonomy_term_page'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Taxonomy term page'),
+      '#description' => t('Expire url of the expiring taxonomy term.'),
+      '#default_value' => variable_get('expire_taxonomy_term_taxonomy_term_page', EXPIRE_TAXONOMY_TERM_TAXONOMY_TERM_PAGE),
+    );
+
+    if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
+      $form['tabs']['taxonomy_term']['expire']['expire_taxonomy_term_reference_pages'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Taxonomy term reference pages'),
+        '#description' => t('Expire urls of entities which are referenced from the expiring taxonomy term.'),
+        '#default_value' => variable_get('expire_taxonomy_term_reference_pages', EXPIRE_TAXONOMY_TERM_REFERENCE_PAGES),
+      );
+
+      if (module_exists('field_collection')) {
+        $form['tabs']['taxonomy_term']['expire']['expire_taxonomy_term_reference_field_collection_pages'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Traverse references attached to field collections'),
+          '#description' => t('Expire urls of entities which are referenced from field collections attached to the expiring taxonomy_term.'),
+          '#default_value' => variable_get('expire_taxonomy_term_reference_field_collection_pages', EXPIRE_TAXONOMY_TERM_REFERENCE_FC_PAGES),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="expire_taxonomy_term_reference_pages"]' => array('checked' => TRUE),
+            ),
+          ),
+        );
+      }
+    }
+
+    $form['tabs']['taxonomy_term']['expire']['expire_taxonomy_term_custom'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Custom pages'),
+      '#description' => t('Expire user-defined custom urls.'),
+      '#default_value' => variable_get('expire_taxonomy_term_custom', EXPIRE_TAXONOMY_TERM_CUSTOM),
+    );
+
+    $form['tabs']['taxonomy_term']['expire']['expire_taxonomy_term_custom_pages'] = array(
+      '#type' => 'textarea',
+      '#title' => t('Enter custom URLs'),
+      '#description' => t('Enter one relative URL per line. It can be the path of a taxonomy term (e.g. !example1) or of any alias (e.g. !example2). However, it has to be the final URL, not a redirect (use the !link1 and !link2 modules).', array(
+          '!example1' => '<strong>taxonomy/term/[taxonomy_term:tid]</strong>',
+          '!example2' => '<strong>my/path</strong>',
+          '!link1' => l('Global Redirect', 'https://drupal.org/project/globalredirect'),
+          '!link2' => l('Redirect', 'https://drupal.org/project/redirect')
+        )) . '<br/>'
+        . t('If you want to match a path with any ending, add "|wildcard" to the end of the line (see !link1 for details). Example: !example1 will match !example1a, but also !example1b, !example1c, etc.', array(
+          '!link1' => l('function cache_clear_all', 'https://api.drupal.org/api/drupal/includes%21cache.inc/function/cache_clear_all/7'),
+          '!example1' => '<strong>my/path|wildcard</strong>',
+          '!example1a' => '<strong>my/path</strong>',
+          '!example1b' => '<strong>my/path/one</strong>',
+          '!example1c' => '<strong>my/path/two</strong>'
+        )) . '<br/>'
+        . t('You may use tokens here.'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="expire_taxonomy_term_custom"]' => array('checked' => TRUE),
+        ),
+      ),
+      '#default_value' => variable_get('expire_taxonomy_term_custom_pages'),
+    );
+  }
+
+
   // COMMENT SETTINGS.
   if (module_exists('comment')) {
     $form['tabs']['comment'] = array(
       '#type' => 'fieldset',
       '#title' => t('Comment expiration'),
       '#group' => 'tabs',
-      '#weight' => 2,
+      '#weight' => 3,
     );
 
     $form['tabs']['comment']['override'] = array(
@@ -325,7 +436,7 @@ function expire_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('User expiration'),
     '#group' => 'tabs',
-    '#weight' => 3,
+    '#weight' => 4,
   );
 
   $form['tabs']['user']['actions'] = array(
@@ -424,7 +535,7 @@ function expire_admin_settings_form() {
       '#type' => 'fieldset',
       '#title' => t('File expiration'),
       '#group' => 'tabs',
-      '#weight' => 4,
+      '#weight' => 5,
     );
 
     $form['tabs']['file']['actions'] = array(
@@ -490,7 +601,7 @@ function expire_admin_settings_form() {
       '#type' => 'fieldset',
       '#title' => t('Votingapi expiration'),
       '#group' => 'tabs',
-      '#weight' => 5,
+      '#weight' => 6,
     );
 
     $form['tabs']['votingapi']['actions'] = array(
@@ -556,7 +667,7 @@ function expire_admin_settings_form() {
       '#type' => 'fieldset',
       '#title' => t('Menu links expiration'),
       '#group' => 'tabs',
-      '#weight' => 6,
+      '#weight' => 7,
     );
 
     $form['tabs']['menu_links']['actions'] = array(
@@ -760,6 +871,78 @@ function expire_node_settings_form(&$form) {
     $form['expire']['comment_expires']['expire_comment_custom_pages']['#default_value'] =
       variable_get('expire_comment_custom_pages_' . $node_type);
   }
+
+  // Attach js.
+  $form['#attached']['js'][] = drupal_get_path('module', 'expire') . '/js/expire.admin.js';
+}
+
+/**
+ * Settings form for a taxonomy vocabulary.
+ */
+function expire_taxonomy_term_settings_form(&$form) {
+
+  if (empty($form['#vocabulary']->machine_name)) {
+    return;
+  }
+
+  $vocabulary = $form['#vocabulary']->machine_name;
+
+  $form['expire'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Cache Expiration'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+  );
+
+  // TAXONOMY TERM SETTINGS.
+  $form['expire']['expire_taxonomy_term_override_defaults'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Override default settings for this vocabulary'),
+    '#default_value' => variable_get('expire_taxonomy_term_override_defaults_' . $vocabulary),
+  );
+
+  // Copy here settings from default settings form.
+  $settings_form = expire_admin_settings_form();
+  $form['expire']['taxonomy_term_actions'] = $settings_form['tabs']['taxonomy_term']['actions'];
+  $form['expire']['taxonomy_term_expires'] = $settings_form['tabs']['taxonomy_term']['expire'];
+
+  // Display fieldsets with settings only if they should be overriden.
+  $form['expire']['taxonomy_term_actions']['#states'] = array(
+    'visible' => array(':input[name="expire_taxonomy_term_override_defaults"]' => array('checked' => TRUE)),
+  );
+  $form['expire']['taxonomy_term_expires']['#states'] = array(
+    'visible' => array(':input[name="expire_taxonomy_term_override_defaults"]' => array('checked' => TRUE)),
+  );
+
+  // Change tab title to more suitable here.
+  $form['expire']['taxonomy_term_expires']['#title'] = t('What pages should be expired when taxonomy term action is triggered?');
+
+  // Set default settings for this vocabulary.
+  $form['expire']['taxonomy_term_actions']['expire_taxonomy_term_actions']['#default_value'] =
+    variable_get('expire_taxonomy_term_actions_' . $vocabulary, array());
+
+  $form['expire']['taxonomy_term_expires']['expire_taxonomy_term_front_page']['#default_value'] =
+    variable_get('expire_taxonomy_term_front_page_' . $vocabulary, EXPIRE_TAXONOMY_TERM_FRONT_PAGE);
+
+  $form['expire']['taxonomy_term_expires']['expire_taxonomy_term_taxonomy_term_page']['#default_value'] =
+    variable_get('expire_taxonomy_term_taxonomy_term_page_' . $vocabulary, EXPIRE_TAXONOMY_TERM_TAXONOMY_TERM_PAGE);
+
+  if (module_exists('node_reference') || module_exists('user_reference') || module_exists('entityreference')) {
+    $form['expire']['taxonomy_term_expires']['expire_taxonomy_term_reference_pages']['#default_value'] =
+      variable_get('expire_taxonomy_term_reference_pages_' . $vocabulary, EXPIRE_TAXONOMY_TERM_REFERENCE_PAGES);
+
+    if (module_exists('field_collection')) {
+      $form['expire']['taxonomy_term_expires']['expire_taxonomy_term_reference_field_collection_pages']['#default_value'] =
+        variable_get('expire_taxonomy_term_reference_field_collection_pages_' . $vocabulary, EXPIRE_TAXONOMY_TERM_REFERENCE_FC_PAGES);
+    }
+  }
+
+  $form['expire']['taxonomy_term_expires']['expire_taxonomy_term_custom']['#default_value'] =
+    variable_get('expire_taxonomy_term_custom_' . $vocabulary, EXPIRE_TAXONOMY_TERM_CUSTOM);
+
+  $form['expire']['taxonomy_term_expires']['expire_taxonomy_term_custom_pages']['#default_value'] =
+    variable_get('expire_taxonomy_term_custom_pages_' . $vocabulary);
 
   // Attach js.
   $form['#attached']['js'][] = drupal_get_path('module', 'expire') . '/js/expire.admin.js';

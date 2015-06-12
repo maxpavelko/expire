@@ -56,6 +56,21 @@ function expire_drush_command() {
     'callback' => 'drush_expire_node'
   );
 
+  // Expire taxonomy term objects.
+  $items['expire-term'] = array(
+    'description' => 'Expire a taxonomy term by term ID.',
+    'arguments' => array(
+      'tids' => 'Numeric term ids to expire separated by spaces.',
+    ),
+    'examples' => array(
+      'drush expire-term 2' => 'Expire single taxonomy term by term ID.',
+      'drush xp-term 2 24 612' => 'Expire multiple taxonomy terms by term IDs.',
+    ),
+    'aliases' => array('xp-term'),
+    'drupal dependencies' => array('expire'),
+    'callback' => 'drush_expire_term',
+  );
+
   // Expire user objects.
   $items['expire-user'] = array(
     'description' => 'Expire a user by user ID.',
@@ -130,6 +145,13 @@ function drush_expire_internal_path() {
  */
 function drush_expire_node() {
   _drush_expire_entity('node');
+}
+
+/**
+ * Callback for expire-term drush command.
+ */
+function drush_expire_term() {
+  _drush_expire_entity('taxonomy_term');
 }
 
 /**
