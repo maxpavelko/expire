@@ -438,7 +438,10 @@ class ExpireAPI {
       // found.
       $alias = drupal_get_path_alias($path, $langcode);
       if ($alias != $path) {
-        $urls[$alias] = $alias;
+        $urls[$alias] = array(
+          'path' => $alias,
+          'query' => array(),
+        );
         $wildcards[$alias] = $wildcard;
       }
     }
