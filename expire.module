@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Contains expire.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function expire_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the expire module.
+    case 'help.page.expire':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Logic for expiring cached pages.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function expire_theme() {
+  $theme = [];
+
+  return $theme;
+}

@@ -1,0 +1,5 @@
+name: Cache Expiration
+type: module
+description: Logic for expiring cached pages.
+core: 8.x
+package: Performance and scalability
