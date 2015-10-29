@@ -1,0 +1,5 @@
+expire.settings_form:
+  title: Cache expiration
+  description: 'Settings for expiration of cached pages.'
+  route_name: expire.settings_form
+  parent: system.admin_config_system

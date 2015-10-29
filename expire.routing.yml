@@ -1,0 +1,11 @@
+
+expire.settings_form:
+  path: '/admin/config/system/expire'
+  defaults:
+    _form: '\Drupal\expire\Form\ExpireSettingsForm'
+    _title: 'Cache expiration'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: TRUE
+
