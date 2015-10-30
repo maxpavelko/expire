@@ -8,9 +8,10 @@
 
 namespace Drupal\expire;
 
+use Drupal\Core\Field\PluginSettingsBase;
 use Drupal\Core\Form\FormStateInterface;
 
-class ExpireComponentBase extends PluginSettingsBase implements ExpireComptonentInterface {
+class ExpireComponentBase extends PluginSettingsBase implements ExpireComponentInterface {
 
   /**
    * {@inheritdoc}

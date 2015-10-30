@@ -1,0 +1,4 @@
+services:
+  expire.component_manager:
+    class: Drupal\expire\ExpireComponentManager
+    parent: default_plugin_manager

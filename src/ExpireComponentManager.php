@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains IcecreamManager.
+ * Contains ExpireComponentManager.
  */
 
 namespace Drupal\expire;
@@ -13,10 +13,10 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 /**
  * Expire component plugin manager.
  */
-class IcecreamManager extends DefaultPluginManager {
+class ExpireComponentManager extends DefaultPluginManager {
 
   /**
-   * Constructs an IcecreamManager object.
+   * Constructs an ExpireComponentManager object.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths

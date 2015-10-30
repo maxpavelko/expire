@@ -10,7 +10,11 @@ namespace Drupal\expire;
 
 use Drupal\Core\Form\FormStateInterface;
 
-interface ExpireComptonentInterface extends PluginSettingsInterface {
+use Drupal\Core\Field\PluginSettingsInterface;
+
+
+
+interface ExpireComponentInterface extends PluginSettingsInterface {
   /**
    * Returns a form to configure settings for the expire component.
    *
