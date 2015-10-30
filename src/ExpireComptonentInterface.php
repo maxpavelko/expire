@@ -8,32 +8,33 @@
 
 namespace Drupal\expire;
 
+use Drupal\Core\Form\FormStateInterface;
 
 interface ExpireComptonentInterface extends PluginSettingsInterface {
-    /**
-     * Returns a form to configure settings for the expire component.
-     *
-     * @param array $form
-     *   The form where the settings form is being included in.
-     * @param \Drupal\Core\Form\FormStateInterface $form_state
-     *   The current state of the form.
-     *
-     * @return array
-     *   The form elements for the formatter settings.
-     */
-    public function settingsForm(array $form, FormStateInterface $form_state);
+  /**
+   * Returns a form to configure settings for the expire component.
+   *
+   * @param array $form
+   *   The form where the settings form is being included in.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   The form elements for the formatter settings.
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state);
 
-    /**
-     * Executes expiration actions for node.
-     *
-     * @param object
-     *   Component object.
-     *
-     * @param $action
-     *   Action that has been executed.
-     *
-     * @param $skip_action_check
-     *   Shows whether should we check executed action or just expire node.
-     */
-    public function expire($object, $action, $skip_action_check = FALSE);
+  /**
+   * Executes expiration actions for node.
+   *
+   * @param object
+   *   Component object.
+   *
+   * @param $action
+   *   Action that has been executed.
+   *
+   * @param $skip_action_check
+   *   Shows whether should we check executed action or just expire node.
+   */
+  public function expire($object, $action, $skip_action_check = FALSE);
 }
