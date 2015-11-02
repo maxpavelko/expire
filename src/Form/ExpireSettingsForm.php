@@ -67,7 +67,7 @@ class ExpireSettingsForm extends ConfigFormBase {
 
     // Common settings.
     $form['tabs']['status'] = array(
-      '#type' => 'fieldset',
+      '#type' => 'details',
       '#title' => t('Module status'),
       '#group' => 'tabs',
       '#weight' => 0,
@@ -78,7 +78,7 @@ class ExpireSettingsForm extends ConfigFormBase {
     foreach ($components as $component) {
       $instance = $this->expireComponentManager->createInstance($component['id']);
       $form['tabs'][$component['id']] = array(
-        '#type' => 'fieldset',
+        '#type' => 'details',
         '#title' => $component['label'],
         '#group' => 'tabs',
         '#weight' => 0,
