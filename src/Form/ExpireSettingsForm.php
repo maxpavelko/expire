@@ -41,9 +41,14 @@ class ExpireSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return [
-      'expire.settings'
-    ];
+    $names = array('expire.settings.status');
+
+    $components = $this->expireComponentManager->getDefinitions();
+    foreach ($components as $component) {
+      $names[] = 'expire.settings.' . $component['id'];
+    }
+
+    return $names;
   }
 
   /**
@@ -57,7 +62,7 @@ class ExpireSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('expire.settings');
+    $config = $this->config('expire.settings.status');
 
     $form['tabs'] = array(
       '#type' => 'vertical_tabs',
@@ -74,9 +79,11 @@ class ExpireSettingsForm extends ConfigFormBase {
     );
 
     $components = $this->expireComponentManager->getDefinitions();
-
     foreach ($components as $component) {
-      $instance = $this->expireComponentManager->createInstance($component['id']);
+      $settings = $this->config('expire.settings.' . $component['id']);
+
+      $instance = $this->expireComponentManager->createInstance($component['id'], array('settings' => $settings->get()));
+
       $form['tabs'][$component['id']] = array(
         '#type' => 'details',
         '#title' => $component['label'],
@@ -101,8 +108,21 @@ class ExpireSettingsForm extends ConfigFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     parent::submitForm($form, $form_state);
 
-    $this->config('expire.settings')
+
+    $components = $this->expireComponentManager->getDefinitions();
+    foreach ($components as $component) {
+      $settings = $this->config('expire.settings.' . $component['id']);
+
+      $instance = $this->expireComponentManager->createInstance($component['id'], array('settings' => $settings->get()));
+
+      $values = $instance->defaultSettings();
+      foreach ($values as $key => $value) {
+        $values[$key] = $form_state->getValue($key);
+      }
+      $this->config('expire.settings.' . $component['id'])->setData($values)->save();
+    }
+
+    $this->config('expire.settings.status')
       ->save();
   }
-
 }
