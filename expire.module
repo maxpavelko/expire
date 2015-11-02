@@ -8,6 +8,97 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
+ * Constant definitions.
+ */
+
+// Module statuses.
+define('EXPIRE_STATUS_DISABLED', 0);
+define('EXPIRE_STATUS_ENABLED_INTERNAL', 1);
+define('EXPIRE_STATUS_ENABLED_EXTERNAL', 2);
+
+// This setting should be disabled when varnish or acquia_purge modules are
+// used as cache backends. Not until this issue is fixed in varnish module:
+// https://drupal.org/node/2017097 (OR in expire). The default is true,
+// setting it to false by default could be preferable, but could also cause
+// unnecessary confusion from old users - so it stays as true.
+define('EXPIRE_INCLUDE_BASE_URL', TRUE);
+
+// Node actions.
+define('EXPIRE_NODE_INSERT', 1);
+define('EXPIRE_NODE_UPDATE', 2);
+define('EXPIRE_NODE_DELETE', 3);
+
+// Taxonomy term actions.
+define('EXPIRE_TAXONOMY_TERM_INSERT', 1);
+define('EXPIRE_TAXONOMY_TERM_UPDATE', 2);
+define('EXPIRE_TAXONOMY_TERM_DELETE', 3);
+
+// Comment actions.
+define('EXPIRE_COMMENT_INSERT'   , 1);
+define('EXPIRE_COMMENT_UPDATE'   , 2);
+define('EXPIRE_COMMENT_DELETE'   , 3);
+define('EXPIRE_COMMENT_PUBLISH'  , 4);
+define('EXPIRE_COMMENT_UNPUBLISH', 5);
+
+// User actions.
+define('EXPIRE_USER_INSERT', 1);
+define('EXPIRE_USER_UPDATE', 2);
+define('EXPIRE_USER_DELETE', 3);
+define('EXPIRE_USER_CANCEL', 4);
+
+// VotingAPI actions.
+define('EXPIRE_VOTINGAPI_INSERT', 1);
+define('EXPIRE_VOTINGAPI_DELETE', 2);
+
+// File actions.
+define('EXPIRE_FILE_UPDATE', 1);
+define('EXPIRE_FILE_DELETE', 2);
+
+// Menu link actions.
+define('EXPIRE_MENU_LINK_INSERT', 1);
+define('EXPIRE_MENU_LINK_UPDATE', 2);
+define('EXPIRE_MENU_LINK_DELETE', 3);
+
+// Debug levels.
+define('EXPIRE_DEBUG_DISABLED', 0);
+define('EXPIRE_DEBUG_WATCHDOG', 1);
+define('EXPIRE_DEBUG_FULL',     2);
+
+// Default values for cache expiration.
+define('EXPIRE_NODE_FRONT_PAGE'                 , FALSE);
+define('EXPIRE_NODE_NODE_PAGE'                  , TRUE);
+define('EXPIRE_NODE_TERM_PAGES'                 , FALSE);
+define('EXPIRE_NODE_REFERENCE_PAGES'            , FALSE);
+define('EXPIRE_NODE_REFERENCE_FC_PAGES'         , FALSE);
+define('EXPIRE_NODE_CUSTOM'                     , FALSE);
+define('EXPIRE_TAXONOMY_TERM_FRONT_PAGE'        , FALSE);
+define('EXPIRE_TAXONOMY_TERM_TAXONOMY_TERM_PAGE', TRUE);
+define('EXPIRE_TAXONOMY_TERM_TERM_PAGES'        , FALSE);
+define('EXPIRE_TAXONOMY_TERM_REFERENCE_PAGES'   , FALSE);
+define('EXPIRE_TAXONOMY_TERM_REFERENCE_FC_PAGES', FALSE);
+define('EXPIRE_TAXONOMY_TERM_CUSTOM'            , FALSE);
+define('EXPIRE_COMMENT_FRONT_PAGE'              , FALSE);
+define('EXPIRE_COMMENT_COMMENT_PAGE'            , TRUE);
+define('EXPIRE_COMMENT_REFERENCE_PAGES'         , FALSE);
+define('EXPIRE_COMMENT_NODE_PAGE'               , TRUE);
+define('EXPIRE_COMMENT_NODE_TERM_PAGES'         , FALSE);
+define('EXPIRE_COMMENT_NODE_REFERENCE_PAGES'    , FALSE);
+define('EXPIRE_COMMENT_NODE_REFERENCE_FC_PAGES' , FALSE);
+define('EXPIRE_COMMENT_CUSTOM'                  , FALSE);
+define('EXPIRE_USER_FRONT_PAGE'                 , FALSE);
+define('EXPIRE_USER_USER_PAGE'                  , TRUE);
+define('EXPIRE_USER_TERM_PAGES'                 , FALSE);
+define('EXPIRE_USER_REFERENCE_PAGES'            , FALSE);
+define('EXPIRE_USER_REFERENCE_FC_PAGES'         , FALSE);
+define('EXPIRE_USER_CUSTOM'                     , FALSE);
+define('EXPIRE_VOTINGAPI_ENTITY'                , FALSE);
+define('EXPIRE_VOTINGAPI_ENTITY_PAGE'           , FALSE);
+define('EXPIRE_VOTINGAPI_CUSTOM'                , FALSE);
+define('EXPIRE_FILE_FILE'                       , FALSE);
+define('EXPIRE_FILE_FRONT_PAGE'                 , FALSE);
+define('EXPIRE_FILE_CUSTOM'                     , FALSE);
+
+/**
  * Implements hook_help().
  */
 function expire_help($route_name, RouteMatchInterface $route_match) {
