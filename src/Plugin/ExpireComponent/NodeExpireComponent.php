@@ -20,6 +20,22 @@ class NodeExpireComponent extends ExpireComponentBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return array(
+      'expire_node_actions' => array(),
+      'expire_node_front_page' => EXPIRE_NODE_FRONT_PAGE,
+      'expire_node_node_page' => EXPIRE_NODE_NODE_PAGE,
+      'expire_node_term_pages' => EXPIRE_NODE_TERM_PAGES,
+      'expire_node_reference_pages' => EXPIRE_NODE_REFERENCE_PAGES,
+      'expire_node_reference_field_collection_pages' => EXPIRE_NODE_REFERENCE_FC_PAGES,
+      'expire_node_custom' => EXPIRE_NODE_CUSTOM,
+      'expire_node_custom_pages' => ''
+    ) + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $elements = parent::settingsForm($form, $form_state);
 
@@ -46,7 +62,7 @@ class NodeExpireComponent extends ExpireComponentBase {
         EXPIRE_NODE_UPDATE => t('Node update'),
         EXPIRE_NODE_DELETE => t('Node delete'),
       ),
-      '#default_value' => '',
+      '#default_value' => $this->getSetting('expire_node_actions'),
     );
 
     $elements['expire'] = array(
@@ -58,14 +74,14 @@ class NodeExpireComponent extends ExpireComponentBase {
       '#type' => 'checkbox',
       '#title' => t('Front page'),
       '#description' => t('Expire url of the site front page'),
-      '#default_value' => '',
+      '#default_value' => $this->getSetting('expire_node_front_page'),
     );
 
     $elements['expire']['expire_node_node_page'] = array(
       '#type' => 'checkbox',
       '#title' => t('Node page'),
       '#description' => t('Expire url of the expiring node.'),
-      '#default_value' => '',
+      '#default_value' => $this->getSetting('expire_node_node_page'),
     );
 
     if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
@@ -73,16 +89,15 @@ class NodeExpireComponent extends ExpireComponentBase {
         '#type' => 'checkbox',
         '#title' => t('Node term pages'),
         '#description' => t('Expire urls of terms that are selected in the expiring node.'),
-        '#default_value' => '',
+        '#default_value' => $this->getSetting('expire_node_term_pages'),
       );
     }
-
 
     $elements['expire']['expire_node_reference_pages'] = array(
       '#type' => 'checkbox',
       '#title' => t('Node reference pages'),
       '#description' => t('Expire urls of entities which are referenced from the expiring node.'),
-      '#default_value' => '',
+      '#default_value' => $this->getSetting('expire_node_reference_pages'),
     );
 
     if (\Drupal::moduleHandler()->moduleExists('field_collection')) {
@@ -90,7 +105,7 @@ class NodeExpireComponent extends ExpireComponentBase {
         '#type' => 'checkbox',
         '#title' => t('Traverse references attached to field collections'),
         '#description' => t('Expire urls of entities which are referenced from field collections attached to the expiring node.'),
-        '#default_value' => '',
+        '#default_value' => $this->getSetting('expire_node_reference_field_collection_pages'),
         '#states' => array(
           'visible' => array(
             ':input[name="expire_node_reference_pages"]' => array('checked' => TRUE),
@@ -103,7 +118,7 @@ class NodeExpireComponent extends ExpireComponentBase {
       '#type' => 'checkbox',
       '#title' => t('Custom pages'),
       '#description' => t('Expire user-defined custom urls.'),
-      '#default_value' => '',
+      '#default_value' => $this->getSetting('expire_node_custom'),
     );
 
     $elements['expire']['expire_node_custom_pages'] = array(
@@ -117,7 +132,7 @@ class NodeExpireComponent extends ExpireComponentBase {
           ':input[name="expire_node_custom"]' => array('checked' => TRUE),
         ),
       ),
-      '#default_value' => '',
+      '#default_value' => $this->getSetting('expire_node_custom_pages'),
     );
 
 
